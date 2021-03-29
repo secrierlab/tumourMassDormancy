@@ -212,9 +212,9 @@ phate_coordinates_combat <- merge(phate_coordinates_combat, prog_expr,
 setwd("~/Documents/GitHub/tumourMassDormancy/PHATE_analysis/Figures/")
 pdf("PHATE_coordinates_coloured_by_TMD_assignments.pdf",height = 5, width = 8)
 ggplot(phate_coordinates_combat, aes(x=PHATE1, y=PHATE2, colour = TMD_two_categories)) +
-  geom_point(size = 1, alpha = 0.5) + theme_classic() +
+  geom_point(size = 1) + theme_classic() +
   theme(legend.title = element_blank(), legend.key.width = unit(1, "cm")) + 
-  scale_colour_manual(values = c("NO" = "grey90", "YES" = "hotpink3")) +
+  scale_colour_manual(values = c("NO" = "grey90", "YES" = "darkmagenta")) +
   theme(legend.position = "right", legend.title = element_text(face = "bold", angle = 90)) +
   theme(text = element_text(family = "Helvetica", size = 10))
 dev.off()
