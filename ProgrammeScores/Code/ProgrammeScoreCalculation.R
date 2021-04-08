@@ -5,6 +5,7 @@
 ##Load the required packages:
 library(biomaRt)
 library(ggplot2)
+library(stringr)
 
 #######################
 ####Define gene lists:
@@ -39,9 +40,9 @@ angiogenic_dormancy_list <- c(angiogenic_dormancy_downregulated,angiogenic_dorma
 #Apobec programme gene list:
 apobec_list <- c("AICDA", "APOBEC1", "APOBEC2", "APOBEC3A", "APOBEC3B", "APOBEC3C", "APOBEC3D", "APOBEC3F", "APOBEC3G", "APOBEC3H", "APOBEC4")
 #COSMIC genes:
-setwd("~/Documents/TMD_manuscript_data/GeneLists/")
 COSMIC <- read.table("Census_allMon Feb 24 15_27_31 2020.tsv", header = TRUE,sep = "\t")
 cosmic_list <- as.character(COSMIC$Gene.Symbol)
+
 
 ####################################
 ###Obtain ENSG ID for programme genes
@@ -54,9 +55,12 @@ biomart_conversion <- getBM(attributes=c("ensembl_gene_id", "hgnc_symbol"), valu
 biomart_conversion <- biomart_conversion[!(biomart_conversion$ensembl_gene_id %in% c("ENSG00000276977","ENSG00000262156")),]
 
 
-##Load the expression data:
-setwd("~/Documents/TMD_manuscript_data/RNA_seq/")
-load("combined_experssion_FPKM.RData")
+#########################################################
+##Load the expression data and change ENSG to HGNC_symbol
+#########################################################
+#(data is log2 transformed)
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/RNA_seq/")
+load("combined_experssion_FPKM.RData") # or load "example_FPKM_data.RData" for a shortened data frame with 100 samples
 rnaseq_cancer <- combined_data
 for (i in all_genes_list) {
   
@@ -71,7 +75,10 @@ rnaseq_cancer <- data.frame(t(rnaseq_cancer))
 
 
 
-#Calculate a score for the programmes:
+#######################################
+#Calculate a score for each of the programmes:
+#######################################
+
 prog_expr <- data.frame(row.names = colnames(rnaseq_cancer))
 
 prog_expr$mean_APOBEC <- apply(rnaseq_cancer[apobec_list, ], function (x) mean(x, na.rm = T), MARGIN = 2)
@@ -99,7 +106,9 @@ rownames(prog_expr) <- gsub('\\.', '-', rownames(prog_expr))
 
 
 
-######Some patient have two or more samples (randomly select only one)
+#####################################################################
+######Randomly select one RNA-seq entry per Patient:
+######################################################################
 prog_expr$Barcode <- rownames(prog_expr)
 prog_expr$SampleID <- sapply(prog_expr$Barcode, function(x)
   paste(strsplit(x,"-")[[1]][1:4],collapse="-"))
@@ -120,15 +129,19 @@ for (i in uniquePatients) {
   rm(random_sample)
 }
 prog_expr <- prog_expr[prog_expr$Barcode %in% Barcodes,]
-setwd("~/Documents/GitHub/tumourMassDormancy/ProgrammeScores/")
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/ProgrammeScores/")
 save(prog_expr, file = "program_expression_scores_updated.RData")
 
 
 
-###############################
-####Density distribution of the programme scores
-setwd("~/Documents/GitHub/tumourMassDormancy/ProgrammeScores/")
+################################################
+####Plot density distribution of the programme scores
+#################################################
+#Load programme scores:
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/ProgrammeScores/")
 load("program_expression_scores_updated.RData")
+
+#########Plots:
 setwd("~/Documents/GitHub/tumourMassDormancy/ProgrammeScores/Figures/")
 
 pdf("APOBEC_score_density_plot.pdf",height = 5,width = 5)
