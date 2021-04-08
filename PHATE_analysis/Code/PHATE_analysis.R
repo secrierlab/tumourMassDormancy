@@ -211,6 +211,30 @@ ggplot(phate_coordinates_combat, aes(x=PHATE1, y=PHATE2, colour = mean_APOBEC)) 
   guides(colour = guide_colorbar(title.position = "left")) +
   theme(text = element_text(family = "Helvetica", size = 10))
 dev.off()
+
+
+pdf("PHATE_combat_colour_by_immunological_dormancy_programme.pdf",height = 5, width = 8)
+ggplot(phate_coordinates_combat, aes(x=PHATE1, y=PHATE2, colour = ImmunogenicDormancy)) +
+  geom_point() + theme_classic() +
+  theme(legend.title = element_blank(), legend.key.width = unit(1, "cm")) +
+  scale_color_gradient2(low = "green", midpoint = mean(phate_coordinates_combat$ImmunogenicDormancy), mid = "blue", high = "red") +
+  theme(legend.position = "right", legend.title = element_text(face = "bold", angle = 90)) +
+  guides(colour = guide_colorbar(title.position = "left")) +
+  theme(text = element_text(family = "Helvetica", size = 10))
+dev.off()
+
+
+pdf("PHATE_combat_colour_by_angiogenic_dormancy_programme.pdf",height = 5, width = 8)
+ggplot(phate_coordinates_combat, aes(x=PHATE1, y=PHATE2, colour = AngiogenicDormancy)) +
+  geom_point() + theme_classic() +
+  theme(legend.title = element_blank(), legend.key.width = unit(1, "cm")) +
+  scale_color_gradient2(low = "green", midpoint = mean(phate_coordinates_combat$AngiogenicDormancy), mid = "blue", high = "red") +
+  theme(legend.position = "right", legend.title = element_text(face = "bold", angle = 90)) +
+  guides(colour = guide_colorbar(title.position = "left")) +
+  theme(text = element_text(family = "Helvetica", size = 10))
+dev.off()
+
+
 ##############################################################################################
 
 
