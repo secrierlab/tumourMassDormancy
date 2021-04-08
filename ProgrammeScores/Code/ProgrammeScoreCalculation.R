@@ -1,45 +1,51 @@
-######################################################################
-####Calculating Scores for TMD, immunogenic and angiogenic dormancy:
+##################################################################################################
+####Calculating Scores for APOBEC, Exhaustion, TMD, immunological and angiogenic dormancy programmes:
+##################################################################################################
 
 ##Load the required packages:
 library(biomaRt)
+library(ggplot2)
 
-
+#######################
 ####Define gene lists:
-setwd("~/Documents/TMD_manuscript_data/GeneLists/")
+#######################
+
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/GeneLists/")
+
+#####Exhaustion gene list:
 exhaustion_list <- read.table("exhaustionMarkers.txt", header = FALSE, sep = "\t")
 exhaustion_list <- as.character(exhaustion_list$V1)
-
+##TMD gene list:
 Gene_list <- read.table("dormancyMarkers_immunologic-angiogenic_updated.txt", header = TRUE,sep = "\t")
-##Create a TMD gene list:
 dormancy_list_upregulated <- Gene_list[Gene_list$Direction %in% "up",]
 dormancy_list_upregulated <- as.character(dormancy_list_upregulated$Gene)
 dormancy_list_downregulated <- Gene_list[Gene_list$Direction %in% "down",]
 dormancy_list_downregulated <- as.character(dormancy_list_downregulated$Gene)
 dormancy_list <- c(dormancy_list_upregulated, dormancy_list_downregulated)
-##Create an immunologic dormancy gene list:
+##Immunological dormancy gene list:
 immunologic_dormancy <- Gene_list[Gene_list$Type %in% "immunologic",]
 immunologic_dormancy_list_upregualted <- immunologic_dormancy[immunologic_dormancy$Direction %in% "up",]
 immunologic_dormancy_list_upregualted <- as.character(immunologic_dormancy_list_upregualted$Gene)
 immunologic_dormancy_list_downregulated <- immunologic_dormancy[immunologic_dormancy$Direction %in% "down",]
 immunologic_dormancy_list_downregulated <- as.character(immunologic_dormancy_list_downregulated$Gene)
 immunologic_dormancy_list <- c(immunologic_dormancy_list_downregulated, immunologic_dormancy_list_upregualted)
-##Create an angiogenic dormancy gene list:
+##Angiogenic dormancy gene list:
 angiogenic_dormancy <- Gene_list[Gene_list$Type %in% "angiogenic",]
 angiogenic_dormancy_upregulated <- angiogenic_dormancy[angiogenic_dormancy$Direction %in% "up",]
 angiogenic_dormancy_upregulated <- as.character(angiogenic_dormancy_upregulated$Gene)
 angiogenic_dormancy_downregulated <- angiogenic_dormancy[angiogenic_dormancy$Direction %in% "down",]
 angiogenic_dormancy_downregulated <- as.character(angiogenic_dormancy_downregulated$Gene)
 angiogenic_dormancy_list <- c(angiogenic_dormancy_downregulated,angiogenic_dormancy_upregulated)
-#List of APOBEC genes:
+#Apobec programme gene list:
 apobec_list <- c("AICDA", "APOBEC1", "APOBEC2", "APOBEC3A", "APOBEC3B", "APOBEC3C", "APOBEC3D", "APOBEC3F", "APOBEC3G", "APOBEC3H", "APOBEC4")
-#List of COSMIC genes:
+#COSMIC genes:
 setwd("~/Documents/TMD_manuscript_data/GeneLists/")
 COSMIC <- read.table("Census_allMon Feb 24 15_27_31 2020.tsv", header = TRUE,sep = "\t")
 cosmic_list <- as.character(COSMIC$Gene.Symbol)
 
-
-###Convert gene lists to ENSG 
+####################################
+###Obtain ENSG ID for programme genes
+#####################################
 all_genes_list <- c(dormancy_list, exhaustion_list, apobec_list)
 human = useMart("ensembl", dataset="hsapiens_gene_ensembl")
 biomart_conversion <- getBM(attributes=c("ensembl_gene_id", "hgnc_symbol"), values=all_genes_list, mart=human, filters = "hgnc_symbol")
