@@ -1,10 +1,19 @@
 ###################################################################################
 #####PHATE analysis using TMD and exhaustion genes
+###################################################################################
+
+###############
+##Load packages:
+library(biomaRt)
+library(phateR)
+library(data.table)
+library(ggplot2)
+
 
 #######################
 ####Define gene lists:
 #######################
-setwd("~/Documents/TMD_manuscript_data/GeneLists/")
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/GeneLists/")
 exhaustion_list <- read.table("exhaustionMarkers.txt", header = FALSE, sep = "\t")
 exhaustion_list <- as.character(exhaustion_list$V1)
 Gene_list <- read.table("dormancyMarkers_immunologic-angiogenic_updated.txt", header = TRUE,sep = "\t")
@@ -15,24 +24,23 @@ dormancy_list_downregulated <- Gene_list[Gene_list$Direction %in% "down",]
 dormancy_list_downregulated <- as.character(dormancy_list_downregulated$Gene)
 dormancy_list <- c(dormancy_list_upregulated, dormancy_list_downregulated)
 
-#############################
-##Biomart conversion
-#############################
+
+####################################################
+##Biomart conversion - obtain ENSG IDS for all genes
+###################################################
 ###Convert gene lists to ENSG 
 all_genes_list <- c(dormancy_list, exhaustion_list)
-library(biomaRt)
 human = useMart("ensembl", dataset="hsapiens_gene_ensembl")
 biomart_conversion <- getBM(attributes=c("ensembl_gene_id", "hgnc_symbol"), values=all_genes_list, mart=human, filters = "hgnc_symbol")
 #Two ENSG numbers are reported for PDCD1 - use ENSG00000188389 NOT ENSG00000276977
-#Two ENSG numbers are reported for APOBEC3A - use ENSG00000128383 NOT ENSG00000262156
-biomart_conversion <- biomart_conversion[!(biomart_conversion$ensembl_gene_id %in% c("ENSG00000276977","ENSG00000262156")),]
+biomart_conversion <- biomart_conversion[!(biomart_conversion$ensembl_gene_id %in% c("ENSG00000276977")),]
 
 
-###########################
+#################################################
 ##Load the expression data (no ComBat correction)
-###########################
-setwd("~/Documents/TMD_manuscript_data/RNA_seq/")
-load("combined_experssion_FPKM.RData")
+#################################################
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/RNA_seq/")
+load("combined_experssion_FPKM.RData") #or load "example_FPKM_data.RData" for an example dataframe with 100 samples
 rnaseq_cancer <- combined_data
 for (i in all_genes_list) {
   
@@ -45,17 +53,18 @@ for (i in all_genes_list) {
 rnaseq_cancer <- rnaseq_cancer[,colnames(rnaseq_cancer) %in% c(all_genes_list,"cancer_type")]
 
 
-###############
-###Load scores:
-###############
-setwd("~/Documents/GitHub/tumourMassDormancy/ProgrammeScores/")
+#######################################
+###Load scores and merge with expr data
+######################################
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/ProgrammeScores/")
 load("program_expression_scores_updated.RData")
-#Merge the scores dataframe with expression dataframe to create a reference annotation df
+#Merge dataframe:
 rnaseq_cancer$Barcode <- rownames(rnaseq_cancer)
 annotation <- merge(prog_expr, rnaseq_cancer,
                     by.x = "Barcode", by.y = "Barcode")
-#remove columns concering gene expression
+#remove columns with gene expression:
 annotation[,10:56] <- NULL
+######Make sure expression data has only samples with score annotation
 rnaseq_cancer <- rnaseq_cancer[rownames(rnaseq_cancer) %in% annotation$Barcode,]
 
 
@@ -63,14 +72,18 @@ rnaseq_cancer <- rnaseq_cancer[rownames(rnaseq_cancer) %in% annotation$Barcode,]
 #########################################
 ##Run phate using non-combat treated data
 ########################################
-setwd("~/Documents/GitHub/tumourMassDormancy/PHATE_analysis/NoComBat_results/")
-library(phateR)
+#Select data for TMD and exhaustion genes only 
 rnaseq_cancer <- rnaseq_cancer[,colnames(rnaseq_cancer) %in% c(dormancy_list, exhaustion_list)]
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/RNA_seq/")
+save(rnaseq_cancer, file = "PHATE_expression_data_no_COMBAT.RData")
+load("PHATE_expression_data_no_COMBAT.RData") 
+
+#Run PHATE:
+setwd("~/Documents/GitHub/tumourMassDormancy/PHATE_analysis/NoComBat_results/")
 phate_expr <- as.matrix(rnaseq_cancer)
 set.seed(123456)
 data_phate <- phate(phate_expr)
 phate_coordinates <- data.frame(data_phate$embedding)
-setwd("~/Documents/GitHub/tumourMassDormancy/PHATE_analysis/NoComBat_results/")
 save(phate_coordinates, file = "phate_coordinates_no_combat.RData")
 
 
@@ -80,9 +93,8 @@ save(phate_coordinates, file = "phate_coordinates_no_combat.RData")
 ######################################
 ##Load expression data (ComBat treated)
 ######################################
-library(data.table)
 setwd("~/Documents/TMD_manuscript_data/RNA_seq/")
-expr.data.combat <- fread("TCGA_combat_tumor_type_correction.txt", sep = "\t")
+expr.data.combat <- fread("TCGA_combat_tumor_type_correction.txt", sep = "\t") #Or load "example_FPKM_data_COMBAT.RData" for an example with 100 samples
 expr.data.combat <- expr.data.combat[which(expr.data.combat$genes %in% c(dormancy_list, exhaustion_list)),]
 all_genes <- expr.data.combat$genes
 expr.data.combat$genes <- NULL
@@ -103,11 +115,16 @@ rownames(expr.data.combat) <- sapply(rownames(expr.data.combat), function(x)
 expr.data.combat <- expr.data.combat[rownames(expr.data.combat) %in% annotation$Barcode,]
 
 
+
 #########################################
 ##Run phate using Combat treated data
 ########################################
-setwd("~/Documents/Wojciech_manuscript/PHATE_analysis/Analysis_using_TMD_and_Exhaustion_genes/ComBat_results/")
-library(phateR)
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/RNA_seq/")
+save(expr.data.combat, file = "PHATE_expression_data_COMBAT.RData")
+load("PHATE_expression_data_COMBAT.RData") 
+
+#Run PHATE
+setwd("~/Documents/GitHub/tumourMassDormancy/PHATE_analysis/ComBat_results/")
 phate_expr <- as.matrix(expr.data.combat)
 set.seed(123456)
 data_phate <- phate(phate_expr)
@@ -130,7 +147,6 @@ save(phate_coordinates_combat, file = "phate_coordinates_combat.RData")
 
 ################################################################
 #Plots coloured by cancer type
-library(ggplot2)
 #Plot PHATE coodinates without COMBAT (coloured by cancer type)
 setwd("~/Documents/GitHub/tumourMassDormancy/PHATE_analysis/NoComBat_results/")
 load("phate_coordinates_no_combat.RData")
@@ -205,7 +221,7 @@ dev.off()
 setwd("~/Documents/GitHub/tumourMassDormancy/PHATE_analysis/ComBat_results/")
 load("phate_coordinates_combat.RData")
 phate_coordinates_combat$Barcode <- rownames(phate_coordinates_combat)
-setwd("~/Documents/GitHub/tumourMassDormancy/TumourMassDormancy_ProliferationApoptosisRatio_relationship/")
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/ProgrammeScores/")
 load("programme_scores_and_TMD_assignments.RData")
 phate_coordinates_combat <- merge(phate_coordinates_combat, prog_expr, 
                                   by.x = "Barcode", by.y = "Barcode")
