@@ -251,8 +251,8 @@ dev.off()
 
 pdf("Dormancy_programme_correlations_colour_by_TMD_assignments_three_categories_detailed.pdf",height = 7, width = 13)
 p <- ggplot(prog_expr, aes(x=ImmunogenicDormancy, y=AngiogenicDormancy, color = TMD_three_categories_detailed)) + 
-  geom_point(size=2, alpha = 0.5) + 
-  scale_color_manual(values = c("Angiogenic and Immunogenic Dormancy" = "#00AFBB", "NO" = "grey52","MID" = "grey78", "Angiogenic Dormancy" = "#E7B800", "Immunogenic Dormancy" = "#FC4E07")) + theme_classic() +
+  geom_point(size=2) + 
+  scale_color_manual(values = c("Angiogenic and Immunogenic Dormancy" = "#1B9E77", "NO" = "grey52","MID" = "grey78", "Angiogenic Dormancy" = "#D95F02", "Immunogenic Dormancy" = "#7570B3")) + theme_classic() +
   facet_wrap(~cancer_type, ncol = 6) + geom_hline(yintercept = 0.03183, linetype = "dashed",color = "black") + geom_vline(xintercept = 0.50831, linetype = "dashed",color = "black")
 print(p)
 dev.off()
