@@ -6,7 +6,9 @@ library(finalfit)
 # Download survival data into your current directory, and save within tcga.clinical list
 # NOTE: This will download the data to your current directory. 
 # Would recommend downloading the data whilst in your preferred directory
-studies <- list.dirs(path = 'GDCdata', full.names = FALSE, recursive = FALSE)
+studies <- as.character(
+  sapply(c('ACC','BLCA','BRCA','CESC','CHOL','COAD','ESCA','GBM','HNSC','KICH','KIRC','KIRP','LGG','LIHC','LUAD','LUSC','MESO','OV','PAAD','PCPG','PRAD','READ','SARC','SKCM','STAD','TGCT','THCA','THYM','UCEC','UCS','UVM'),
+                  function(x) paste0('TCGA-',x)))
 
 tcga.clinical <- list()
 for (study in studies) {
