@@ -27,7 +27,9 @@ for (study in studies) {
 surv.data <- do.call(rbind, tcga.clinical)
 
 # Add TMD categories
-load('programme_scores_and_TMD_assignments.RData')
+setwd('~/Documents/GitHub/tumourMassDormancy/')
+
+load('Data/ProgrammeScores/programme_scores_and_TMD_assignments.RData')
 prog_expr <- prog_expr[, c('PatientID',
                            'TMD_two_categories', 'TMD_three_categories',
                            'TMD_two_categories_detailed', 'TMD_three_categories_detailed')]
@@ -41,6 +43,8 @@ surv.tmd$status <- ifelse(surv.tmd$vital_status == 'Dead', 1, 0)
 surv.tmd2 <- surv.tmd[!is.na(surv.tmd$time),]
 
 # Fit survival curves
+setwd('~/Documents/GitHub/tumourMassDormancy/Survival/')
+
 surv.tmd2$TMD <- sapply(surv.tmd2$TMD_three_categories_detailed,
                         function(x) ifelse(x == 'Angiogenic and Immunogenic Dormancy', 'A/ID',
                                            ifelse(x == 'Angiogenic Dormancy', 'AD',
