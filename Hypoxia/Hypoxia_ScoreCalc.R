@@ -62,15 +62,28 @@ hypoxia.scores$patient <- sapply(hypoxia.scores$Barcode,
 
 # Match samples within our hypoxia scores and those calculated by Bhandari et al.
 hypoxia.merge <- merge(hypoxia.scores, bhandari, by.x = 'patient', by.y = 'patient_id')
-p_bhandari <- ggplot(hypoxia.merge, aes(x = buffa, y = Buffa_hypoxia_score_pan_cancer)) + 
+
+# Buffa
+p_buffa <- ggplot(hypoxia.merge, aes(x = buffa, y = Buffa_hypoxia_score_pan_cancer)) + 
   geom_point(alpha = .05) + theme_bw() +
   labs(x = 'Buffa (calculated)', y = 'Buffa (Bhandari et al)')
-print(p_bhandari)
-ggsave(filename = 'Hypoxia/Figures/Buffa_BhandariComparison.pdf', plot = p_bhandari)
+print(p_buffa)
+ggsave(filename = 'Hypoxia/Figures/Buffa_BhandariComparison.pdf', plot = p_buffa)
 
 
+# West
+p_west <- ggplot(hypoxia.merge, aes(x = west, y = West_hypoxia_score_pan_cancer)) +
+  geom_point(alpha = .05) + theme_bw() +
+  labs(x = 'West (calculated)', y = 'West (Bhandari et al)')
+print(p_west)
+ggsave(filename = 'Hypoxia/Figures/West_BhandariComparison.pdf', plot = p_west)
 
-
+# Winter
+p_winter <- ggplot(hypoxia.merge, aes(x = winter, y = Winter_hypoxia_score_pan_cancer)) +
+  geom_point(alpha = .05) + theme_bw() +
+  labs(x = 'Winter (calculated)', y = 'Winter (Bhandari et al)')
+print(p_winter)
+ggsave(filename = 'Hypoxia/Figures/Winter_BhandariComparison.pdf', plot = p_winter)
 
 
 
