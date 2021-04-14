@@ -22,7 +22,7 @@ apobec.group.replic$SampleCode <- sapply(apobec.group.replic$samples,
 # Load in Z-normalised data
 se.list <- list()
 col.req <- c('barcode','patient','sample','Study','definition')
-se.files <- list.files(path = 'Data/RNA_seq/Z_Scores',
+se.files <- list.files(path = '~/Documents/PhD/Projects/Apobec_Dormancy/Data/GeneExpression/Z_Score',
                        pattern = 'Rdata',
                        full.names = TRUE)
 

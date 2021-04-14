@@ -58,7 +58,7 @@ index.apobecTRUE <- which(rf.input.full$Apobec.Enriched)
 index.apobecFALSE <- which(!rf.input.full$Apobec.Enriched)
 
 # Create objects for saving results
-n.runs <- 2 # Each run takes around 40 seconds
+n.runs <- 100 # Each run takes around 40 seconds
 auc.data.list <- list()
 auc.vals <- vector(length = n.runs)
 
@@ -129,7 +129,7 @@ ggsave(filename = 'ApobecEnrichmentAnalysis/Figures/AUC_100sims.pdf', plot = p_a
 
 # Generate histogram of AUC values
 pdf(file = 'ApobecEnrichmentAnalysis/Figures/AUC_values_hist.pdf')
-hist(auc.vals, breaks = seq(0.80, 0.85, by = 0.005),
+hist(auc.vals, breaks = seq(0.81, 0.86, by = 0.005),
      xlab = 'AUC', main = paste0('Mean AUC = ', round(mean(auc.vals), 4)),
      col = 'plum')
 abline(v = mean(auc.vals), col = 'purple4')

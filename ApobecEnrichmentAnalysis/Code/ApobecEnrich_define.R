@@ -13,7 +13,7 @@ library('ggpubr')
 
 # Obtain mutational signature profiles
 setwd('~/Documents/GitHub/tumourMassDormancy')
-files = list.files('Data/MutationalSignatures/')
+files = list.files('Data/MutationalSignatures', full.names = TRUE)
 
 sigs.complete <- NULL
 for (file in files) {
