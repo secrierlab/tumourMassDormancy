@@ -64,3 +64,20 @@ ggsave(filename = 'Hypoxia/Figures/TMD_by_HypoxiaGroup_full.pdf', plot = p_full)
 p_facet <- p_full + facet_wrap(~ cancer_type, nrow = 5, ncol = 6) + theme(legend.position = 'top')
 print(p_facet)
 ggsave(filename = 'Hypoxia/Figures/TMD_by_HypoxiaGroup_facet.pdf', plot = p_facet)
+
+
+# Plots to determine the distribution of hypoxia scores across cancers
+df.full.perc <- df.full.plot[df.full.plot$cancer_type != 'KICH',] %>%
+  group_by(cancer_type, Buffa.Group) %>%
+  summarise(n=n()) %>% 
+  group_by(cancer_type) %>% 
+  mutate(perc=100*n/sum(n))
+
+p_study.percs <- ggplot(df.full.perc, aes(x = Buffa.Group, y = perc)) +
+  geom_bar(stat = 'identity') +
+  labs(x = 'Hypoxia Group', y = 'Proportion of samples') + 
+  scale_x_discrete(drop = FALSE, breaks = c(-50, 0, 50)) +
+  facet_wrap(~ cancer_type, nrow = 5, ncol = 6)
+print(p_study.percs)
+ggsave(filename = 'Hypoxia/Figures/Hypoxia_by_Study.pdf', plot = p_study.percs)
+
