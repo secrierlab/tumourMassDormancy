@@ -52,14 +52,15 @@ surv.tmd2$TMD <- sapply(surv.tmd2$TMD_three_categories_detailed,
                                            ifelse(x == 'Angiogenic Dormancy', 'AD',
                                                   ifelse(x == 'Immunogenic Dormancy', 'ID',x))))
 surv.tmd2$TMD <- factor(surv.tmd2$TMD, levels = c('NO','MID','AD','ID','A/ID'))
-surv.tmd2$TMD_three_categories <- factor(surv.tmd2$TMD_three_categories, levels = c('NO','MID','YES'))
+surv.tmd2$TMD_status <- factor(surv.tmd2$TMD_three_categories, levels = c('NO','MID','YES'))
 
 # Kaplan-Meier plots
-fit_tmd <- survfit(Surv(time, status) ~ TMD_three_categories, data = surv.tmd2) # standard categories
+fit_tmd <- survfit(Surv(time, status) ~ TMD_status, data = surv.tmd2) # standard categories
 p_tmd <- ggsurvplot(fit_tmd, pval = TRUE, conf.int = TRUE,
                     risk.table = TRUE, risk.table.y.text.col = TRUE)
 print(p_tmd)
 ggsave(filename = 'Figures/KaplanMeier_TMD.pdf', plot = p_tmd$plot)
+ggsave(filename = 'Figures/KaplanMeier_TMD_risktable.pdf', plot = p_tmd$table, height = 2)
 
 fit_tmd2 <- survfit(Surv(time, status) ~ TMD, data = surv.tmd2) # detailed categories
 p_tmd2 <- ggsurvplot(fit_tmd2, pval = TRUE, conf.int = TRUE,
@@ -67,6 +68,7 @@ p_tmd2 <- ggsurvplot(fit_tmd2, pval = TRUE, conf.int = TRUE,
                      palette = c('grey','grey95','#D95F02','#7570B3','#1B9E77'))
 print(p_tmd2)
 ggsave(filename = 'Figures/KaplanMeier_TMDdetailed.pdf', plot = p_tmd2$plot)
+ggsave(filename = 'Figures/KaplanMeier_TMDdetailed_risktable.pdf', plot = p_tmd2$table)
 
 # Kaplan-Meier plots by Tumour Stage
 surv.tmd2$TumorStage <- sapply(surv.tmd2$tumor_stage,
@@ -98,25 +100,6 @@ for (i in 1:length(formulas)) {
          width = 8, height = 10)
 }
 
-# Hazard Ratio comparisons: TMD_three_categories
-hr.collate <- data.frame(formula = c('TMD/Age/Gender','+ Study','+ Stage','+ Study + Stage'),
-                         HR = NA, L = NA, U = NA)
-for (i in 1:length(formulas)) {
-  r <- coxph(formulas[i][[1]], data = surv.tmd2)
-  hr.collate$HR[i] <- coef(r)[2]
-  hr.collate$L[i] <- confint(r)[2,1]
-  hr.collate$U[i] <- confint(r)[2,2]
-}
-hr.collate$formula <- factor(hr.collate$formula, levels = hr.collate$formula)
-
-p_hr <- ggplot(hr.collate, aes(x = 1, y = HR)) + theme_bw() +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  labs(x = element_blank(), y = 'log Hazard Ratio (95% CI)') +
-  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red') +
-  theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
-  facet_wrap(~ formula, nrow = 1); print(p_hr); ggsave(filename = 'Figures/CoxAnalysis_TMD.pdf', plot = p_hr)
-
 # Hazard Ratio comparisons: TMD_three_categories_detailed
 form1 <- as.formula('Surv(time, status) ~ TMD + age_at_diagnosis + gender')
 form2 <- as.formula('Surv(time, status) ~ TMD + age_at_diagnosis + gender + Study')
@@ -147,16 +130,69 @@ p_hr <- ggplot(hr.collate, aes(x = TMD, y = HR)) + theme_bw() +
   scale_colour_manual(values = c('A/ID' = '#1B9E77',
                                  'AD' = '#D95F02',
                                  'ID' = '#7570B3')) +
+  facet_wrap(~ formula, nrow = 1); print(p_hr); ggsave(filename = 'Figures/CoxAnalysis_TMD_detailed_fullstage.pdf', plot = p_hr)
+
+
+# Add Tumor_Stage (assignment of early/late status) and re-run Cox analysis
+surv.tmd2$TumorStage_bin <- ifelse(surv.tmd2$TumorStage %in% c('Stage 1','Stage 2'),'Early Stage',
+                                   ifelse(surv.tmd2$TumorStage %in% c('Stage 3','Stage 4'),'Late Stage',NA))
+
+form1 <- as.formula('Surv(time, status) ~ TMD + age_at_diagnosis + gender')
+form2 <- as.formula('Surv(time, status) ~ TMD + age_at_diagnosis + gender + Study')
+form3 <- as.formula('Surv(time, status) ~ TMD + age_at_diagnosis + gender + TumorStage_bin')
+form4 <- as.formula('Surv(time, status) ~ TMD + age_at_diagnosis + gender + Study + TumorStage_bin')
+formulas <- c(form1, form2, form3, form4)
+
+hr.collate <- data.frame()
+for (form in formulas) {
+  r <- coxph(form, data = surv.tmd2)
+  r.res <- data.frame(TMD = c('AD','ID','A/ID'),
+                      HR = coef(r)[2:4],
+                      L = confint(r)[2:4,1],
+                      U = confint(r)[2:4,2],
+                      formula = ifelse(form == form1, 'TMD/Age/Gender',
+                                       ifelse(form == form2, '+ Study',
+                                              ifelse(form == form3, '+ Stage',
+                                                     ifelse(form == form4, '+ Study + Stage',NA)))))
+  hr.collate <- rbind(hr.collate, r.res)
+}
+hr.collate$formula <- factor(hr.collate$formula, levels = c('TMD/Age/Gender','+ Study','+ Stage','+ Study + Stage'))
+hr.collate$TMD <- factor(hr.collate$TMD, levels = c('ID','AD','A/ID'))
+
+p_hr <- ggplot(hr.collate, aes(x = TMD, y = HR)) + theme_bw() +
+  geom_point(aes(colour = TMD), size = 4) + geom_errorbar(aes(ymax = U, ymin = L)) +
+  labs(x = 'Tumour Mass Dormancy Group', y = 'log Hazard ratio (95% CI)') +
+  geom_hline(yintercept = 0, linetype = 'dashed', color = 'red') +
+  scale_colour_manual(values = c('A/ID' = '#1B9E77',
+                                 'AD' = '#D95F02',
+                                 'ID' = '#7570B3')) +
   facet_wrap(~ formula, nrow = 1); print(p_hr); ggsave(filename = 'Figures/CoxAnalysis_TMD_detailed.pdf', plot = p_hr)
 
 # TMD categorisation by tumour stage
-p_tmdStage <- ggplot(surv.tmd2[!is.na(surv.tmd2$TumorStage),], aes(x = TumorStage, fill = TMD_three_categories)) +
-  geom_bar(position = 'fill') + scale_y_continuous(labels = scales::percent)
-print(p_tmdStage)
-ggsave(filename = 'Figures/Barplot_TMD_by_Stage.pdf', plot = p_tmdStage)
+p_tmdStagebin <- ggplot(surv.tmd2[!is.na(surv.tmd2$TumorStage_bin),], aes(x = TumorStage_bin, fill = TMD)) +
+  geom_bar(position = 'fill') + scale_y_continuous(labels = scales::percent) +
+  labs(x = 'Tumour Stage')
+print(p_tmdStagebin)
+ggsave(filename = 'Figures/Barplot_TMDdet_by_Stage.pdf', plot = p_tmdStagebin)
 
 p_tmdStage <- ggplot(surv.tmd2[!is.na(surv.tmd2$TumorStage),], aes(x = TumorStage, fill = TMD)) +
-  geom_bar(position = 'fill') + scale_y_continuous(labels = scales::percent)
+  geom_bar(position = 'fill') + scale_y_continuous(labels = scales::percent) +
+  labs(x = 'Tumour Stage')
 print(p_tmdStage)
-ggsave(filename = 'Figures/Barplot_TMDdet_by_Stage.pdf', plot = p_tmdStage)
+ggsave(filename = 'Figures/Barplot_TMDdet_by_FullStage.pdf', plot = p_tmdStage)
+
+# Fisher's exact test to determine significant TMD proportion differences
+tmd.status <- c('NO','AD','ID','A/ID')
+fisher.est = fisher.pval <- vector(length = length(tmd.status))
+for (i in 1:length(tmd.status)) {
+  tmd.table <- table(surv.tmd2$TumorStage_bin, surv.tmd2$TMD == tmd.status[i])
+  fisher.test.tmd <- fisher.test(tmd.table)
+  fisher.est[i] <- fisher.test.tmd$estimate
+  fisher.pval[i] <- fisher.test.tmd$p.value
+}
+fisher.results <- data.frame(TMD.Status = tmd.status,
+                             Estimate = fisher.est,
+                             P.value = fisher.pval)
+print(fisher.results)
+
 
