@@ -115,7 +115,7 @@ p_lenient <- ggplot(head(imp.df, 10), aes(x = MeanDecreaseGini, y = reorder(Gene
 print(p_lenient)
 
 save(imp.df, file = 'FishersExactTest_EnrichmentAnalysis/RandomForest_Importance_Lenient.RData')
-ggsave(filename = 'FishersExactTest_EnrichmentAnalysis/Figures/RandomForest_ImportanceTop10_Lenient.pdf', plot = p_strict)
+ggsave(filename = 'FishersExactTest_EnrichmentAnalysis/Figures/RandomForest_ImportanceTop10_Lenient.pdf', plot = p_lenient)
 
 
 
