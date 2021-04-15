@@ -138,7 +138,7 @@ dev.off()
 # Collate importance analysis
 rownames(importance.gini.decrease) <- importance.gini.decrease$Gene
 importance.gini.decrease <- importance.gini.decrease[, -1]
-save(importance.gini.decrease, file = 'ApobecEnrichmentAnalysis/Results/MeanDecreaseFini_100sims.Rdata')
+save(importance.gini.decrease, file = 'ApobecEnrichmentAnalysis/Results/MeanDecreaseGini_100sims.Rdata')
 
 # Print importance analysis
 importance.summary <- data.frame(Gene = rownames(importance.gini.decrease),
@@ -152,7 +152,7 @@ p_importance <- ggplot(importance.summary, aes(x = MeanDecreaseGini, y = reorder
   geom_errorbar(aes(xmin = MeanDecreaseGini - sd, xmax = MeanDecreaseGini + sd), width = .5) +
   ylab('Gene') + xlab('Mean Decrease in Gini Index') + theme_bw()
 print(p_importance)
-ggsave('ApobecEnrichmentAnalysis/Figures/Importance_Top10.pdf', plot = p_importance)
+ggsave('ApobecEnrichmentAnalysis/Figures/Importance_Top10.pdf', plot = p_importance, width = 5, height = 5)
 
 
 
