@@ -23,6 +23,12 @@ This folder contains the code for calculating hypoxia signature scores and assoc
 - Hypoxia_TMDCategories.R: Displays the varying distributions of Buffa signature hypoxia scores associated with the detailed tumour mass dormancy categories, as well as the shifting proportions of tumour mass dormancy categorisation associated with hypoxia scores at both the pan-cancer and cancer-specific levels.
 - Hypoxia_DormancyCorrelation.R: Displays correlations between the hypoxia and various tumour mass dormancy-associated scores, as well as creating volcano plots visualising correlations on a cancer-specific basis.
 
+## Survival
+
+This folder contains the code for conducting survival analysis associated with tumour mass dormancy categorisation.
+
+- Survival_TMD.R: Visualises survival curves using the pan-cancer cohort, and as a comparison of early/late stage cancers. Runs Cox proportional hazard models to account for features including age at diagnosis, gender, cancer type, and tumour stage in both binary (early/late) and full (Stage I-IV) modes. Conducts a Fisher's exact test to determine significant differences in tumour mass dormancy between early/late stage cancers.
+
 # Copyright
 
 This code is free and is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY. See the GNU General Public License for more details.
