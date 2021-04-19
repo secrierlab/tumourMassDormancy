@@ -15,6 +15,14 @@ This folder contains the code which establishes how the tumour mass dormancy and
 - RandomForest_exemplary.R: Creates a single random forest using the method as detailed above, and runs further visualisation, including association with normalised PLG expression (Fig 4F) and the corresponding multidimensional scaling plot (Fig 4G). Finally, runs Wilcoxon tests to determine differences in median expressions between Apobec-enriched/non-enriched samples.
 - Zscore_normalization.R: Runs standard Z-score normalisation on exemplary FPKM-normalised data.
 
+## Hypoxia
+
+This folder contains the code for calculating hypoxia signature scores and associating these with tumour mass dormancy categories.
+
+- Hypoxia_ScoreCalc.R: Calculates hypoxia scores using the signatures defined by Buffa, West, and Winter, following the procedure detailed by Bhandari et al. Compares the scores calculated here with those determined by Bhandari et al. from a slightly smaller TCGA cohort.
+- Hypoxia_TMDCategories.R: Displays the varying distributions of Buffa signature hypoxia scores associated with the detailed tumour mass dormancy categories, as well as the shifting proportions of tumour mass dormancy categorisation associated with hypoxia scores at both the pan-cancer and cancer-specific levels.
+- Hypoxia_DormancyCorrelation.R: Displays correlations between the hypoxia and various tumour mass dormancy-associated scores, as well as creating volcano plots visualising correlations on a cancer-specific basis.
+
 # Copyright
 
 This code is free and is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY. See the GNU General Public License for more details.
