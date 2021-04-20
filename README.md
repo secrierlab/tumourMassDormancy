@@ -17,7 +17,11 @@ This folder contains the code which establishes how the tumour mass dormancy and
 
 ## FishersExactTest_EnrichmentAnalysis
 
-Within this folder **FishersExactTestAnalysis.R** is used to investigate the links between tumour mass dormancy and specific cancer driver events using a Fisher’s Exact Test enrichment analysis.
+This folder contains code which is used to investigate links between tumour mass dormancy and specific cancer driver events.
+
+- **FishersExactTestAnalysis.R** uses Fisher’s exact tests to identify known drivers of tumorigenesis with enrichment or depletion of mutations across all TCGA solid cancer primary tumour samples
+- **FishersExactTestAnalysis_cancerwise.R** uses Fisher’s exact tests to identify known drivers of tumorigenesis with enrichment or depletion of mutations within individual TCGA cancer studies
+- **FishersExactTestAnalysis_hotspots.R** uses Fisher’s exact test analysis to test for enrichment or depletion of HRAS, KRAS and NRAS recurrent hotspot mutations within TCGA samples exhibiting tumour mass dormancy
 
 
 ## Hypoxia
