@@ -193,6 +193,7 @@ for (i in 1:length(tmd.status)) {
 fisher.results <- data.frame(TMD.Status = tmd.status,
                              Estimate = fisher.est,
                              P.value = fisher.pval)
+fisher.results$P.adjust <- p.adjust(fisher.results$P.value, method = 'BH')
 print(fisher.results)
 
 
