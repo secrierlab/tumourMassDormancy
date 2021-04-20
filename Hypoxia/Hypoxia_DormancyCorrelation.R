@@ -12,42 +12,6 @@ load('Data/ProgrammeScores/programme_scores_and_TMD_assignments.RData')
 # Merge programme and hypoxia scores
 prog_hypoxia.merge <- merge(prog_expr, hypoxia.scores, by = 'Barcode')
 
-# Pan-cancer continuous TMD/hypoxia score plots
-# Correlation with mean_APOBEC feature
-p_apobec <- ggplot(prog_hypoxia.merge, aes(x = buffa, y = mean_APOBEC)) + 
-  geom_point(alpha = .05) + geom_smooth(method = 'lm') + theme_bw() +
-  ggtitle(paste0('APOBEC programme: R^2 = ', round(cor(x = prog_hypoxia.merge$buffa, y = prog_hypoxia.merge$mean_APOBEC),2)))
-print(p_apobec)
-ggsave(filename = 'Hypoxia/Figures/HypoxiaCor_Apobec.pdf', plot = p_apobec)
-
-# Correlation with immunological dormancy feature
-p_id <- ggplot(prog_hypoxia.merge, aes(x = buffa, y = ImmunogenicDormancy)) + 
-  geom_point(alpha = .05) + geom_smooth(method = 'lm') + theme_bw() +
-  ggtitle(paste0('Immunological Dormancy programme: R^2 = ', round(cor(x = prog_hypoxia.merge$buffa, y = prog_hypoxia.merge$ImmunogenicDormancy),2)))
-print(p_id)
-ggsave(filename = 'Hypoxia/Figures/HypoxiaCor_Immuno.pdf', plot = p_id)
-
-# Correlation with angiogenic dormancy feature
-p_ang <- ggplot(prog_hypoxia.merge, aes(x = buffa, y = AngiogenicDormancy)) + 
-  geom_point(alpha = .05) + geom_smooth(method = 'lm') + theme_bw() +
-    ggtitle(paste0('Angiogenic Dormancy programme: R^2 = ', round(cor(x = prog_hypoxia.merge$buffa, y = prog_hypoxia.merge$AngiogenicDormancy),2)))
-print(p_ang)
-ggsave(filename = 'Hypoxia/Figures/HypoxiaCor_Angio.pdf', plot = p_ang)
-
-# Correlation with tumour mass dormancy feature
-p_tmd <- ggplot(prog_hypoxia.merge, aes(x = buffa, y = TumourMassDormancy)) + 
-  geom_point(alpha = .05) + geom_smooth(method = 'lm') + theme_bw() +
-  ggtitle(paste0('Tumour Mass Dormancy programme: R^2 = ', round(cor(x = prog_hypoxia.merge$buffa, y = prog_hypoxia.merge$TumourMassDormancy),2)))
-print(p_tmd)
-ggsave(filename = 'Hypoxia/Figures/HypoxiaCor_TMD.pdf', plot = p_tmd)
-
-# Correlation with exhaustion feature
-p_exh <- ggplot(prog_hypoxia.merge, aes(x = buffa, y = Exhaustion)) + 
-  geom_point(alpha = .05) + geom_smooth(method = 'lm') + theme_bw() +
-  ggtitle(paste0('Exhaustion programme: R^2 = ', round(cor(x = prog_hypoxia.merge$buffa, y = prog_hypoxia.merge$Exhaustion),2)))
-print(p_exh)
-ggsave(filename = 'Hypoxia/Figures/HypoxiaCor_Exhaustion.pdf', plot = p_exh)
-
 # Hypoxia/Dormancy correlations by cancer + save values for volcano plots
 
 dormancy.features <- c('mean_APOBEC','Exhaustion','ImmunogenicDormancy','AngiogenicDormancy','TumourMassDormancy')
