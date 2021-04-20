@@ -93,7 +93,7 @@ save(phate_coordinates, file = "phate_coordinates_no_combat.RData")
 ######################################
 ##Load expression data (ComBat treated)
 ######################################
-setwd("~/Documents/TMD_manuscript_data/RNA_seq/")
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/RNA_seq/")
 expr.data.combat <- fread("TCGA_combat_tumor_type_correction.txt", sep = "\t") #Or load "example_FPKM_data_COMBAT.RData" for an example with 100 samples
 expr.data.combat <- expr.data.combat[which(expr.data.combat$genes %in% c(dormancy_list, exhaustion_list)),]
 all_genes <- expr.data.combat$genes

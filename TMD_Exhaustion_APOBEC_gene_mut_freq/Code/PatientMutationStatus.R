@@ -114,7 +114,7 @@ save(maf_all, file = "maf_all.RData")
 ###Summary of mutational data for each patient:
 ###########################################################
 
-setwd("~/Documents/GitHub/tumourMassDormancy/Data/Mutation_data/")
+setwd("~/Documents/GitHub/tumourMassDormancy/Data/MutationData/")
 load("maf_all.RData")
 
 maf_all$Patient_short <- sapply(maf_all$Tumor_Sample_Barcode,
